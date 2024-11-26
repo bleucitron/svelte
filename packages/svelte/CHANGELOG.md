@@ -1,5 +1,11 @@
 # svelte
 
+## 5.2.10
+
+### Patch Changes
+
+- fix: correctly remove unused selectors in middle of selector lists ([#14448](https://github.com/sveltejs/svelte/pull/14448))
+
 ## 5.2.9
 
 ### Patch Changes
