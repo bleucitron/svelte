@@ -3,6 +3,7 @@ import { DEV } from 'esm-env';
 import {
 	CLEAN,
 	DERIVED,
+	DERIVED_LINKED,
 	DESTROYED,
 	DIRTY,
 	EFFECT_HAS_DERIVED,
@@ -18,7 +19,8 @@ import {
 	update_reaction,
 	increment_version,
 	set_active_effect,
-	component_context
+	component_context,
+	get
 } from '../runtime.js';
 import { equals, safe_equals } from './equality.js';
 import * as e from '../errors.js';
@@ -31,8 +33,8 @@ import { inspect_effects, set_inspect_effects } from './sources.js';
  * @returns {Derived<V>}
  */
 /*#__NO_SIDE_EFFECTS__*/
-export function derived(fn) {
-	var flags = DERIVED | DIRTY;
+export function derived(fn, _flags = 0) {
+	var flags = DERIVED | DIRTY | _flags;
 
 	if (active_effect === null) {
 		flags |= UNOWNED;
@@ -66,6 +68,22 @@ export function derived(fn) {
 	}
 
 	return signal;
+}
+
+/**
+ * @template T
+ * @param {() => T} fn
+ */
+export function derived_linked(fn) {
+	return derived(fn, DERIVED_LINKED);
+}
+
+/**
+ * @param {() => void} fn
+ */
+export function link(fn) {
+	const p = derived(fn);
+	get(p);
 }
 
 /**

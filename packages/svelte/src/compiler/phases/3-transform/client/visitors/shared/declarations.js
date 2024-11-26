@@ -48,6 +48,10 @@ export function add_state_transformers(context) {
 					);
 				}
 			};
+		} else if (binding.linked) {
+			context.state.transform[name] = {
+				read: get_value
+			};
 		}
 	}
 }

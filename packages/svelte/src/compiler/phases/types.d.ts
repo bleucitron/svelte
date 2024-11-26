@@ -98,4 +98,10 @@ declare module 'estree' {
 			scope: Scope;
 		};
 	}
+
+	interface SimpleCallExpression {
+		metadata?: {
+			links: Array<{ path: SvelteNode[]; mutation: ArrowFunctionExpression }>;
+		};
+	}
 }

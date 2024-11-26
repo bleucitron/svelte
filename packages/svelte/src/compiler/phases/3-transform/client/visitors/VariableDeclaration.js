@@ -125,16 +125,43 @@ export function VariableDeclaration(node, context) {
 					if (rune === '$state' && should_proxy(value, context.state.scope)) {
 						value = b.call('$.proxy', value);
 					}
-					if (is_state_source(binding, context.state.analysis)) {
+					if (is_state_source(binding, context.state.analysis) || binding.linked) {
 						value = b.call('$.state', value);
 					}
 					return value;
 				};
 
 				if (declarator.id.type === 'Identifier') {
-					declarations.push(
-						b.declarator(declarator.id, create_state_declarator(declarator.id, value))
+					const state_declaration = b.declarator(
+						declarator.id,
+						create_state_declarator(declarator.id, value)
 					);
+
+					if (declarator.init?.type === 'CallExpression' && declarator.init.metadata?.links) {
+						const links = declarator.init.metadata.links;
+
+						declarations.push(
+							b.declarator(
+								declarator.id,
+								b.call(
+									'$.derived_linked',
+									b.thunk(
+										b.block([
+											{ ...node, declarations: [state_declaration] },
+											...links.map((link) =>
+												b.stmt(
+													b.call('$.link', /** @type {Expression} */ (context.visit(link.mutation)))
+												)
+											),
+											b.return(b.call('$.get', declarator.id))
+										])
+									)
+								)
+							)
+						);
+					} else {
+						declarations.push(state_declaration);
+					}
 				} else {
 					const tmp = context.state.scope.generate('tmp');
 					const paths = extract_paths(declarator.id);

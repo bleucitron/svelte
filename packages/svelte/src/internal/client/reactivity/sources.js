@@ -29,7 +29,8 @@ import {
 	INSPECT_EFFECT,
 	UNOWNED,
 	MAYBE_DIRTY,
-	BLOCK_EFFECT
+	BLOCK_EFFECT,
+	DERIVED_LINKED
 } from '../constants.js';
 import * as e from '../errors.js';
 import { legacy_mode_flag } from '../../flags/index.js';
@@ -143,7 +144,10 @@ export function set(source, value) {
 		// we allow the mutation.
 		(derived_sources === null || !derived_sources.includes(source))
 	) {
-		e.state_unsafe_mutation();
+		var derived = /** @type {Derived} */ (active_reaction);
+		if (derived.parent === null || (derived.parent.f & DERIVED_LINKED) === 0) {
+			e.state_unsafe_mutation();
+		}
 	}
 
 	return internal_set(source, value);
@@ -244,6 +248,11 @@ function mark_reactions(signal, status) {
 		if ((flags & (CLEAN | UNOWNED)) !== 0) {
 			if ((flags & DERIVED) !== 0) {
 				mark_reactions(/** @type {Derived} */ (reaction), MAYBE_DIRTY);
+
+				var parent = /** @type {Derived} */ (reaction).parent;
+				if (parent !== null && (parent.f & DERIVED_LINKED) !== 0) {
+					mark_reactions(/** @type {Derived} */ (parent), MAYBE_DIRTY);
+				}
 			} else {
 				schedule_effect(/** @type {Effect} */ (reaction));
 			}

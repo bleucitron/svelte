@@ -142,6 +142,41 @@ export function CallExpression(node, context) {
 			}
 
 			break;
+
+		case '$link': {
+			if (node.arguments.length !== 1) {
+				e.rune_invalid_arguments_length(node, rune, 'exactly one argument');
+			}
+			const mutation = node.arguments[0];
+
+			for (let i = context.path.length - 1; i >= 0; i--) {
+				const node = context.path[i];
+				const declarator = context.path.at(i - 1);
+
+				if (
+					node.type === 'CallExpression' &&
+					get_rune(node, context.state.scope) === '$state' &&
+					declarator?.type === 'VariableDeclarator' &&
+					declarator.id.type === 'Identifier' &&
+					mutation.type === 'ArrowFunctionExpression'
+				) {
+					const binding = context.state.scope.get(declarator.id.name);
+					if (binding) {
+						binding.linked = true;
+					}
+					node.metadata ??= {
+						links: []
+					};
+					node.metadata.links.push({ path: context.path.slice(i), mutation });
+					break;
+				}
+				if (node.type !== 'Property' && node.type !== 'ObjectExpression') {
+					throw new Error('Bad usage of $link');
+				}
+			}
+
+			break;
+		}
 	}
 
 	if (context.state.render_tag) {

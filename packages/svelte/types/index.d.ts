@@ -2706,4 +2706,6 @@ declare function $inspect<T extends any[]>(
  */
 declare function $host<El extends HTMLElement = HTMLElement>(): El;
 
+declare function $link<T>(fn: () => T): T;
+
 //# sourceMappingURL=index.d.ts.map

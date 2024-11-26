@@ -33,6 +33,10 @@ export function CallExpression(node, context) {
 		case '$inspect':
 		case '$inspect().with':
 			return transform_inspect_rune(node, context);
+
+		case '$link': {
+			return b.id('undefined');
+		}
 	}
 
 	if (

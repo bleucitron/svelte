@@ -297,6 +297,7 @@ export interface Binding {
 	references: { node: Identifier; path: SvelteNode[] }[];
 	mutated: boolean;
 	reassigned: boolean;
+	linked: boolean;
 	/** `true` if mutated _or_ reassigned */
 	updated: boolean;
 	scope: Scope;
