@@ -421,6 +421,7 @@ const RUNES = /** @type {const} */ ([
 	'$bindable',
 	'$derived',
 	'$derived.by',
+	'$derived.diff',
 	'$effect',
 	'$effect.pre',
 	'$effect.tracking',

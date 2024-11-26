@@ -196,6 +196,8 @@ declare namespace $derived {
 	 */
 	export function by<T>(fn: () => T): T;
 
+	export function diff<T>(fn: (patch: (fn: () => void) => void) => T): T;
+
 	// prevent intellisense from being unhelpful
 	/** @deprecated */
 	export const apply: never;

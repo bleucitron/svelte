@@ -36,7 +36,7 @@ export function ClassBody(node, context) {
 
 			if (definition.value?.type === 'CallExpression') {
 				const rune = get_rune(definition.value, context.state.scope);
-				if (rune === '$derived' || rune === '$derived.by') {
+				if (rune === '$derived' || rune === '$derived.by' || rune === '$derived.diff') {
 					/** @type {StateField} */
 					const field = {
 						kind: rune === '$derived.by' ? 'derived_by' : 'derived',

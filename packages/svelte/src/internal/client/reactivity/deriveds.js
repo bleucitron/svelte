@@ -7,6 +7,7 @@ import {
 	DIRTY,
 	EFFECT_HAS_DERIVED,
 	MAYBE_DIRTY,
+	DERIVED_DIFF,
 	UNOWNED
 } from '../constants.js';
 import {
@@ -18,7 +19,8 @@ import {
 	update_reaction,
 	increment_version,
 	set_active_effect,
-	component_context
+	component_context,
+	get
 } from '../runtime.js';
 import { equals, safe_equals } from './equality.js';
 import * as e from '../errors.js';
@@ -31,8 +33,8 @@ import { inspect_effects, set_inspect_effects } from './sources.js';
  * @returns {Derived<V>}
  */
 /*#__NO_SIDE_EFFECTS__*/
-export function derived(fn) {
-	var flags = DERIVED | DIRTY;
+export function derived(fn, _flags = 0) {
+	var flags = DERIVED | DIRTY | _flags;
 
 	if (active_effect === null) {
 		flags |= UNOWNED;
@@ -66,6 +68,20 @@ export function derived(fn) {
 	}
 
 	return signal;
+}
+
+/**
+ * @template T
+ * @param {(diff: () => void) => T} fn
+ */
+export function derived_diff(fn) {
+	return derived(() => {
+		const patch = (/** @type {() => void} */ fn) => {
+			const p = derived(fn);
+			get(p);
+		}
+		return fn(patch);
+	}, DERIVED_DIFF);
 }
 
 /**

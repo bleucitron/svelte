@@ -46,7 +46,8 @@ export function ClassBody(node, context) {
 					rune === '$state' ||
 					rune === '$state.raw' ||
 					rune === '$derived' ||
-					rune === '$derived.by'
+					rune === '$derived.by' ||
+					rune === '$derived.diff'
 				) {
 					/** @type {StateField} */
 					const field = {

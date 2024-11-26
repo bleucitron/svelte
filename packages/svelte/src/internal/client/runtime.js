@@ -24,7 +24,8 @@ import {
 	BLOCK_EFFECT,
 	ROOT_EFFECT,
 	LEGACY_DERIVED_PROP,
-	DISCONNECTED
+	DISCONNECTED,
+	DERIVED_DIFF
 } from './constants.js';
 import { flush_tasks } from './dom/task.js';
 import { add_owner } from './dev/ownership.js';
@@ -174,6 +175,19 @@ export function is_runes() {
  */
 export function check_dirtiness(reaction) {
 	var flags = reaction.f;
+
+	if ((flags & DERIVED_DIFF) !== 0) {
+		var children = /** @type {Derived} */ (reaction).children;
+		if (children !== null) {
+			for (let i = 0; i < children.length; i++) {
+				var child = children[i];
+				if ((child.f & DERIVED) !== 0) {
+					get(/** @type {Derived} */ (child))
+				}
+			}
+			return false;
+		}
+	}
 
 	if ((flags & DIRTY) !== 0) {
 		return true;
@@ -737,7 +751,7 @@ export function get(signal) {
 	}
 
 	// Register the dependency on the current reaction signal.
-	if (active_reaction !== null) {
+	if (active_reaction !== null && (active_reaction.f & DERIVED_DIFF) === 0) {
 		if (derived_sources !== null && derived_sources.includes(signal)) {
 			e.state_unsafe_local_read();
 		}

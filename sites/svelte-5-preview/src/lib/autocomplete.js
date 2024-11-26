@@ -111,6 +111,7 @@ const runes = [
 	{ snippet: '$derived', test: is_state_call },
 	{ snippet: '$derived.by(() => {\n\t${}\n});', test: is_state },
 	{ snippet: '$derived.by', test: is_state_call },
+	{ snippet: '$derived.diff', test: is_state_call },
 	{ snippet: '$effect(() => {\n\t${}\n});', test: is_statement },
 	{ snippet: '$effect.pre(() => {\n\t${}\n});', test: is_statement },
 	{ snippet: '$state.raw(${});', test: is_state },

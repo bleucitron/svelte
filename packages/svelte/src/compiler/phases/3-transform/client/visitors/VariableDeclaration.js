@@ -156,12 +156,15 @@ export function VariableDeclaration(node, context) {
 				continue;
 			}
 
-			if (rune === '$derived' || rune === '$derived.by') {
+			if (rune === '$derived' || rune === '$derived.by' || rune === '$derived.diff') {
 				if (declarator.id.type === 'Identifier') {
 					declarations.push(
 						b.declarator(
 							declarator.id,
-							b.call('$.derived', rune === '$derived.by' ? value : b.thunk(value))
+							b.call(
+								rune === '$derived.diff' ? '$.derived_diff' : '$.derived',
+								rune === '$derived.by' || rune === '$derived.diff' ? value : b.thunk(value)
+							)
 						)
 					);
 				} else {
@@ -180,7 +183,13 @@ export function VariableDeclaration(node, context) {
 						rhs = b.call('$.get', id);
 
 						declarations.push(
-							b.declarator(id, b.call('$.derived', rune === '$derived.by' ? value : b.thunk(value)))
+							b.declarator(
+								id,
+								b.call(
+									rune === '$derived.diff' ? '$.derived_diff' : '$.derived',
+									rune === '$derived.by' || rune === '$derived.diff' ? value : b.thunk(value)
+								)
+							)
 						);
 					}
 

@@ -77,6 +77,7 @@ export function CallExpression(node, context) {
 		case '$state.raw':
 		case '$derived':
 		case '$derived.by':
+		case '$derived.diff':
 			if (
 				parent.type !== 'VariableDeclarator' &&
 				!(parent.type === 'PropertyDefinition' && !parent.static && !parent.computed)
@@ -84,7 +85,10 @@ export function CallExpression(node, context) {
 				e.state_invalid_placement(node, rune);
 			}
 
-			if ((rune === '$derived' || rune === '$derived.by') && node.arguments.length !== 1) {
+			if (
+				(rune === '$derived' || rune === '$derived.by' || rune === '$derived.diff') &&
+				node.arguments.length !== 1
+			) {
 				e.rune_invalid_arguments_length(node, rune, 'exactly one argument');
 			} else if (rune === '$state' && node.arguments.length > 1) {
 				e.rune_invalid_arguments_length(node, rune, 'zero or one arguments');
